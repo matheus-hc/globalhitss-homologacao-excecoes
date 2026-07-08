@@ -45,7 +45,7 @@ Validar junto aos usuários de negócio o correto funcionamento dos **fluxos de 
 
 ---
 
-## 6. CASOS DE TESTE
+## 5. CASOS DE TESTE
 
 ### CV-EX-001/CT-EX-001 - Rejeitado Gestor (Ajuste no BP)
 
@@ -211,7 +211,7 @@ Garantir que a demanda, após passar e ser devidamente corrigida nos fluxos de e
 
 ---
 
-## 7. REGISTRO DE MELHORIAS
+## 6. REGISTRO DE MELHORIAS
 
 | ID | Descrição | Impacto | Prioridade | Responsável |
 | :--- | :--- | :--- | :--- | :--- |
@@ -220,7 +220,7 @@ Garantir que a demanda, após passar e ser devidamente corrigida nos fluxos de e
 
 ---
 
-## 8. CONTROLE DE EXECUÇÃO
+## 7. CONTROLE DE EXECUÇÃO
 
 | Caso de Teste | Executor | Data | Resultado | Evidência |
 | :--- | :--- | :--- | :--- | :--- |
@@ -232,7 +232,7 @@ Garantir que a demanda, após passar e ser devidamente corrigida nos fluxos de e
 
 ---
 
-## 9. CRITÉRIOS DE ACEITAÇÃO
+## 8. CRITÉRIOS DE ACEITAÇÃO
 
 | Critério | Resultado |
 | :--- | :--- |
@@ -245,7 +245,7 @@ Garantir que a demanda, após passar e ser devidamente corrigida nos fluxos de e
 
 ---
 
-## 10. RESUMO EXECUTIVO DA HOMOLOGAÇÃO
+## 9. RESUMO EXECUTIVO DA HOMOLOGAÇÃO
 
 **Resultado Geral:**
 ( ) APROVADO PARA PRODUÇÃO

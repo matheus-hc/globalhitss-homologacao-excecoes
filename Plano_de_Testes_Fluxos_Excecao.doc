@@ -259,7 +259,7 @@
     </tbody>
   </table>
 
-  <h2>6. CASOS DE TESTE</h2>
+  <h2>5. CASOS DE TESTE</h2>
 
   <!-- CT-EX-001 -->
   <div class="test-case">
@@ -313,7 +313,7 @@
 
     <h4>Pré-condições</h4>
     <ul>
-      <li>BP aprovado internamente pelo Gestor and submetido para a aprovação comercial do Cliente.</li>
+      <li>BP aprovado internamente pelo Gestor e submetido para a aprovação comercial do Cliente.</li>
       <li>Status da demanda no HOT: <em>Aguardando Aprovação do Cliente</em>.</li>
     </ul>
 
@@ -473,7 +473,7 @@
 
   <div class="page-break"></div>
 
-  <h2>7. REGISTRO DE MELHORIAS</h2>
+  <h2>6. REGISTRO DE MELHORIAS</h2>
   <table>
     <thead>
       <tr>
@@ -502,7 +502,7 @@
     </tbody>
   </table>
 
-  <h2>8. CONTROLE DE EXECUÇÃO</h2>
+  <h2>7. CONTROLE DE EXECUÇÃO</h2>
   <table>
     <thead>
       <tr>
@@ -552,7 +552,7 @@
     </tbody>
   </table>
 
-  <h2>9. CRITÉRIOS DE ACEITAÇÃO</h2>
+  <h2>8. CRITÉRIOS DE ACEITAÇÃO</h2>
   <table>
     <thead>
       <tr>
@@ -588,7 +588,7 @@
     </tbody>
   </table>
 
-  <h2>10. RESUMO EXECUTIVO DA HOMOLOGAÇÃO</h2>
+  <h2>9. RESUMO EXECUTIVO DA HOMOLOGAÇÃO</h2>
   
   <p><strong>Resultado Geral:</strong></p>
   <p>[ &nbsp; ] APROVADO PARA PRODUÇÃO &nbsp; &nbsp; &nbsp; [ &nbsp; ] APROVADO COM RESSALVAS &nbsp; &nbsp; &nbsp; [ &nbsp; ] REPROVADO</p>
