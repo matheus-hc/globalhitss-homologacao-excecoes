@@ -1,0 +1,606 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta charset="utf-8">
+  <title>Plano de Testes de Homologação - Fluxos de Exceção</title>
+  <!--[if gte mso 9]>
+  <xml>
+    <w:WordDocument>
+      <w:View>Print</w:View>
+      <w:Zoom>100</w:Zoom>
+      <w:DoNotOptimizeForBrowser/>
+    </w:WordDocument>
+  </xml>
+  <![endif]-->
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #333333;
+      margin: 1in;
+    }
+    
+    h1 {
+      font-size: 20pt;
+      color: #e30613; /* HITSS Red */
+      border-bottom: 2px solid #e30613;
+      padding-bottom: 5px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    
+    h2 {
+      font-size: 14pt;
+      color: #333333;
+      border-bottom: 1px solid #cccccc;
+      padding-bottom: 3px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    
+    h3 {
+      font-size: 12pt;
+      color: #e30613;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+    
+    h4 {
+      font-size: 11pt;
+      color: #666666;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+    
+    th, td {
+      border: 1px solid #cccccc;
+      padding: 8px 10px;
+      font-size: 10pt;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+      color: #555555;
+    }
+    
+    ul, ol {
+      margin-top: 5px;
+      margin-bottom: 10px;
+      padding-left: 20px;
+    }
+    
+    li {
+      margin-bottom: 5px;
+    }
+    
+    .logo-container {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    
+    .logo-img {
+      max-height: 60px;
+      width: auto;
+    }
+    
+    .alert-box {
+      border-left: 4px solid #f59e0b;
+      background-color: #fffbeb;
+      padding: 10px 15px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      font-size: 10pt;
+    }
+    
+    .alert-title {
+      font-weight: bold;
+      color: #f59e0b;
+      margin-bottom: 3px;
+    }
+    
+    .evidence-box {
+      border: 2px dashed #cccccc;
+      padding: 20px;
+      text-align: center;
+      color: #999999;
+      background-color: #fafafa;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      font-size: 10pt;
+    }
+    
+    .checkbox-container {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    
+    .test-case {
+      margin-bottom: 30px;
+      page-break-inside: avoid;
+    }
+    
+    .page-break {
+      page-break-before: always;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo -->
+  <div class="logo-container">
+    <img src="logo.png" class="logo-img" alt="HITSS Logo">
+  </div>
+
+  <!-- Document Title -->
+  <h1>PLANO DE TESTES DE HOMOLOGAÇÃO - FLUXOS DE EXCEÇÃO</h1>
+  
+  <h2>1. INFORMAÇÕES GERAIS</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%">Campo</th>
+        <th>Informação</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Projeto</strong></td>
+        <td>HOT x BP WEB x BHub (Fluxos de Exceção)</td>
+      </tr>
+      <tr>
+        <td><strong>Ambiente</strong></td>
+        <td>Homologação</td>
+      </tr>
+      <tr>
+        <td><strong>Responsável QA</strong></td>
+        <td>Matheus H Campos</td>
+      </tr>
+      <tr>
+        <td><strong>PO do Projeto</strong></td>
+        <td>Bruna Miguel</td>
+      </tr>
+      <tr>
+        <td><strong>Data Planejada</strong></td>
+        <td>08/07/2026</td>
+      </tr>
+      <tr>
+        <td><strong>Versão do Sistema</strong></td>
+        <td>1.0 (Exceções)</td>
+      </tr>
+      <tr>
+        <td><strong>Cliente</strong></td>
+        <td>HITSS do Brasil</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. OBJETIVO</h2>
+  <p>Validar junto aos usuários de negócio o correto funcionamento dos <strong>fluxos de exceção, rejeições e regras de alçadas de desconto</strong>, garantindo que o sistema processe adequadamente os desvios do fluxo feliz (retornos para ajustes, reprovações e bloqueios) e que a esteira possa ser concluída com sucesso até a <strong>Solicitação de Alta no B.HUB</strong>.</p>
+
+  <h2>3. ESCOPO</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 50%">Dentro do Escopo (Exceções)</th>
+        <th style="width: 50%">Fora do Escopo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="vertical-align: top;">
+          <ul>
+            <li><strong>Rejeitado Gestor:</strong> Ajustes e reenvio de BP.</li>
+            <li><strong>Rejeitado Cliente:</strong> Recusa comercial da demanda.</li>
+            <li><strong>Reprovado SPE:</strong> Reprovação financeira da SPE.</li>
+            <li><strong>Controle de Desconto (LPU Sim):</strong> Validação de Target &lt; Receita.</li>
+            <li><strong>Finalização do fluxo:</strong> Validação até a Solicitação de Alta.</li>
+          </ul>
+        </td>
+        <td style="vertical-align: top;">
+          <ul>
+            <li>Configurações de acessos/MFA.</li>
+            <li>Fluxo Feliz completo regular (sem desvios).</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <h2>4. MATRIZ DE RASTREABILIDADE</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%">Condição de validação</th>
+        <th style="width: 55%">Descrição</th>
+        <th style="width: 20%">Caso de Teste</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>CV-EX-001</strong></td>
+        <td>Validação de ajuste solicitado pelo Gestor (Rejeitado Gestor)</td>
+        <td>CT-EX-001</td>
+      </tr>
+      <tr>
+        <td><strong>CV-EX-002</strong></td>
+        <td>Validação de recusa comercial pelo Cliente (Rejeitado Cliente)</td>
+        <td>CT-EX-002</td>
+      </tr>
+      <tr>
+        <td><strong>CV-EX-003</strong></td>
+        <td>Validação de reprovação técnica/financeira pela SPE (Reprovado SPE)</td>
+        <td>CT-EX-003</td>
+      </tr>
+      <tr>
+        <td><strong>CV-EX-004</strong></td>
+        <td>Validação de desconto aprovado/rejeitado (LPU Sim e Target &lt; Receita)</td>
+        <td>CT-EX-004</td>
+      </tr>
+      <tr>
+        <td><strong>CV-EX-005</strong></td>
+        <td>Validação do encerramento com sucesso na Solicitação de Alta</td>
+        <td>CT-EX-005</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>6. CASOS DE TESTE</h2>
+
+  <!-- CT-EX-001 -->
+  <div class="test-case">
+    <h3>CV-EX-001/CT-EX-001 - Rejeitado Gestor (Ajuste no BP)</h3>
+    
+    <h4>Objetivo</h4>
+    <p>Garantir que, quando o gestor rejeitar o BP de simulação solicitando ajustes, o fluxo retorne ao Elaborador permitindo a edição corretiva e o reenvio para aprovação sem perda de integridade.</p>
+
+    <h4>Pré-condições</h4>
+    <ul>
+      <li>BP de Simulação criado e submetido para aprovação do Gestor.</li>
+      <li>Status do BP: <em>Em Aprovação</em>.</li>
+    </ul>
+
+    <h4>Passos para reproduzir</h4>
+    <ol>
+      <li>Acessar o sistema (HOT).</li>
+      <li>Localizar o BP enviado para aprovação.</li>
+      <li>Clicar em <strong>Rejeitar / Solicitar Ajuste</strong>.</li>
+      <li>Inserir uma justificativa detalhada para o ajuste (ex: <em>"Reajustar quantidade de recursos"</em>).</li>
+      <li>A demanda no HOT tem que estar na fase de Elaborar/Anexar BP.</li>
+      <li>Acessar o sistema com o perfil do <strong>Editor</strong> do BP.</li>
+      <li>Verificar se o status do BP mudou para <em>Rejeitado</em>.</li>
+      <li>Clicar em <strong>Editar</strong>.</li>
+      <li>Abrir o novo BP criado e realizar a alteração sugerida no BP e clicar em <strong>Salvar</strong>.</li>
+      <li>Clicar em <strong>Submeter</strong> novamente.</li>
+    </ol>
+
+    <h4>Resultado Esperado</h4>
+    <ul>
+      <li>O BP retorna para o status de edição com a justificativa de rejeição visível ao Elaborador.</li>
+      <li>Após reenvio pelo Elaborador, o status do BP é atualizado e segue novamente para aprovação.</li>
+    </ul>
+
+    <h4>Evidência</h4>
+    <div class="evidence-box">Cole o print da tela de rejeição do gestor e do status do BP para ajuste</div>
+
+    <div class="checkbox-container">
+      Resultado: [ &nbsp; ] Aprovado &nbsp; &nbsp; &nbsp; [ &nbsp; ] Reprovado
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- CT-EX-002 -->
+  <div class="test-case">
+    <h3>CV-EX-002/CT-EX-002 - Rejeitado pelo Cliente</h3>
+    
+    <h4>Objetivo</h4>
+    <p>Garantir que a rejeição formal da proposta comercial/BP pelo Cliente seja registrada corretamente e interrompa o avanço comercial da oportunidade.</p>
+
+    <h4>Pré-condições</h4>
+    <ul>
+      <li>BP aprovado internamente pelo Gestor and submetido para a aprovação comercial do Cliente.</li>
+      <li>Status da demanda no HOT: <em>Aguardando Aprovação do Cliente</em>.</li>
+    </ul>
+
+    <h4>Passos para reproduzir</h4>
+    <ol>
+      <li>Acessar o módulo de gerenciamento de demandas no HOT.</li>
+      <li>Simular a ação do <strong>Cliente</strong> clicando em <strong>Rejeitar Proposta / Cliente Rejeitou</strong>.</li>
+      <li>Preencher o motivo da recusa (ex: <em>"Preço fora do budget"</em>).</li>
+      <li>Confirmar a rejeição.</li>
+      <li>Verificar o status da demanda no HOT e no BP Web.</li>
+    </ol>
+
+    <h4>Resultado Esperado</h4>
+    <ul>
+      <li>A demanda deve atualizar seu status para <em>Rejeitado pelo Cliente</em>.</li>
+      <li>O sistema deve bloquear qualquer avanço para as fases de pedido ou faturamento para esta demanda específica.</li>
+    </ul>
+
+    <h4>Evidência</h4>
+    <div class="evidence-box">Cole o print da tela da demanda com o status de Rejeitado pelo Cliente</div>
+
+    <div class="checkbox-container">
+      Resultado: [ &nbsp; ] Aprovado &nbsp; &nbsp; &nbsp; [ &nbsp; ] Reprovado
+    </div>
+  </div>
+
+  <!-- CT-EX-003 -->
+  <div class="test-case">
+    <h3>CV-EX-003/CT-EX-003 - Reprovado SPE</h3>
+    
+    <h4>Objetivo</h4>
+    <p>Garantir que, caso a SPE (Sociedade de Propósito Específico / Validação Financeira) reprove a demanda, o fluxo seja encerrado e bloqueado de forma definitiva.</p>
+
+    <h4>Pré-condições</h4>
+    <ul>
+      <li>Demanda com BP anexado e aprovada pelo cliente.</li>
+      <li>Status atual: <em>Aguardando Aprovação SPE</em>.</li>
+    </ul>
+
+    <h4>Passos para reproduzir</h4>
+    <ol>
+      <li>Acessar o HOT com perfil de aprovador <strong>SPE</strong>.</li>
+      <li>Selecionar a demanda pendente.</li>
+      <li>Clicar em <strong>Reprovar</strong>.</li>
+      <li>Informar a justificativa de reprovação.</li>
+      <li>Verificar o status final da demanda no HOT e no BP Web.</li>
+    </ol>
+
+    <h4>Resultado Esperado</h4>
+    <ul>
+      <li>O status da demanda deve atualizar para <em>Reprovado SPE</em>.</li>
+      <li>O fluxo comercial é redirecionado para elaborar PT/PC e no BP precisa ser possível criar uma versão para ajustar as diferenças.</li>
+    </ul>
+
+    <h4>Evidência</h4>
+    <div class="evidence-box">Cole o print da demanda marcada como Reprovado SPE</div>
+
+    <div class="checkbox-container">
+      Resultado: [ &nbsp; ] Aprovado &nbsp; &nbsp; &nbsp; [ &nbsp; ] Reprovado
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- CT-EX-004 -->
+  <div class="test-case">
+    <h3>CV-EX-004/CT-EX-004 - Implantação/Rejeição de Desconto (LPU Sim e Target &lt; Receita Gerada)</h3>
+    
+    <div class="alert-box">
+      <div class="alert-title">Nota Importante (LPU = SIM):</div>
+      Este caso de teste aplica-se apenas caso a pessoa opte por executar o caminho com <strong>LPU = SIM</strong>. Se o usuário optar por prosseguir pelo caminho <strong>Sem LPU</strong>, este cenário será ignorado (bypassed).
+    </div>
+
+    <h4>Objetivo</h4>
+    <p>Validar o fluxo de aprovação de alçada de desconto quando a LPU está marcada como "Sim" e o valor Target estipulado é menor do que a receita total calculada para o projeto.</p>
+
+    <h4>Pré-condições</h4>
+    <ul>
+      <li>Criação de uma simulação de BP com a opção <strong>LPU = Sim</strong>.</li>
+      <li>O valor de receita total do projeto gerado pelos itens calculados deve ser superior ao valor Target definido (ex: Receita total R$ 150.000,00 | Target R$ 130.000,00).</li>
+    </ul>
+
+    <h4>Passos para reproduzir</h4>
+    <ol>
+      <li>Criar um novo BP de simulação.</li>
+      <li>Definir o campo <strong>LPU = Sim</strong>.</li>
+      <li>Informar um valor no campo <strong>Target</strong> que seja <strong>menor</strong> que a receita gerada pelo projeto.</li>
+      <li>Submeter o BP para aprovação.</li>
+      <li><strong>Cenário A (Aprovação de Desconto):</strong>
+        <ul>
+          <li>Acessar com perfil aprovador responsável pela alçada de desconto.</li>
+          <li>Aprovar a solicitação de desconto.</li>
+          <li>Verificar se o BP avança para a aprovação regular.</li>
+        </ul>
+      </li>
+      <li><strong>Cenário B (Rejeição de Desconto):</strong>
+        <ul>
+          <li>Em uma nova simulação nas mesmas condições, o aprovador seleciona <strong>Rejeitar Desconto</strong>.</li>
+          <li>Verificar se o BP retorna ao Elaborador solicitando revisão do Target ou dos itens da LPU.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h4>Resultado Esperado</h4>
+    <ul>
+      <li>O sistema identifica automaticamente a diferença entre o Target e a Receita e aciona o fluxo de aprovação de desconto por alçada.</li>
+      <li><strong>Se Aprovado</strong>: O fluxo segue adiante normalmente.</li>
+      <li><strong>Se Rejeitado</strong>: O BP é bloqueado e retorna para ajuste do elaborador.</li>
+    </ul>
+
+    <h4>Evidência</h4>
+    <div class="evidence-box">Cole o print demonstrando a tela com Target menor que receita e o fluxo de desconto</div>
+
+    <div class="checkbox-container">
+      Resultado: [ &nbsp; ] Aprovado &nbsp; &nbsp; &nbsp; [ &nbsp; ] Reprovado
+    </div>
+  </div>
+
+  <!-- CT-EX-005 -->
+  <div class="test-case">
+    <h3>CV-EX-005/CT-EX-005 - Solicitação de Alta com Sucesso (Pós-Correções)</h3>
+    
+    <h4>Objetivo</h4>
+    <p>Garantir que a demanda, após passar e ser devidamente corrigida nos fluxos de exceção anteriores (como reenvio após ajuste ou aprovação de desconto), possa ser finalizada com sucesso ao atingir a Solicitação de Alta para o B.HUB.</p>
+
+    <h4>Pré-condições</h4>
+    <ul>
+      <li>BP aprovado (com desconto aprovado ou ajustes efetuados).</li>
+      <li>Demanda concluída no HOT com pedido/PO vinculados.</li>
+      <li>Cobertura financeira em 100%.</li>
+    </ul>
+
+    <h4>Passos para reproduzir</h4>
+    <ol>
+      <li>Acessar o BP Web > Grupo.</li>
+      <li>Localizar o BP aprovado com situação <em>Pronta para alta</em>.</li>
+      <li>Selecionar a opção <strong>Fluxo de Alta</strong>.</li>
+      <li>Validar se os dados do projeto, POs cadastradas e cobertura financeira (100%) estão corretos na modal.</li>
+      <li>Clicar em <strong>Solicitar Alta</strong>.</li>
+      <li>Acessar o B.HUB e verificar se a solicitação foi integrada com sucesso.</li>
+    </ol>
+
+    <h4>Resultado Esperado</h4>
+    <ul>
+      <li>A solicitação de alta é criada e integrada ao B.HUB.</li>
+      <li>O status do BP muda para <em>Aguardando Alta</em> e o responsável passa a ser o <em>PCP</em> (o responsável só vira Dir. de Operações na hora de solicitar alta se for caso de arranque).</li>
+      <li>O teste do fluxo é concluído com sucesso neste ponto.</li>
+    </ul>
+
+    <h4>Evidência</h4>
+    <div class="evidence-box">Cole o print da modal de solicitação de alta e a integração no B.HUB</div>
+
+    <div class="checkbox-container">
+      Resultado: [ &nbsp; ] Aprovado &nbsp; &nbsp; &nbsp; [ &nbsp; ] Reprovado
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <h2>7. REGISTRO DE MELHORIAS</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 15%">ID</th>
+        <th style="width: 45%">Descrição</th>
+        <th style="width: 15%">Impacto</th>
+        <th style="width: 13%">Prioridade</th>
+        <th style="width: 12%">Responsável</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>OM-EX-001</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>OM-EX-002</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>8. CONTROLE DE EXECUÇÃO</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 15%">Caso de Teste</th>
+        <th style="width: 25%">Executor</th>
+        <th style="width: 18%">Data</th>
+        <th style="width: 22%">Resultado</th>
+        <th style="width: 20%">Evidência</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>CT-EX-001</strong></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>[ &nbsp; ] Passou &nbsp; [ &nbsp; ] Falhou</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>CT-EX-002</strong></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>[ &nbsp; ] Passou &nbsp; [ &nbsp; ] Falhou</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>CT-EX-003</strong></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>[ &nbsp; ] Passou &nbsp; [ &nbsp; ] Falhou</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>CT-EX-004</strong></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>[ &nbsp; ] Passou &nbsp; [ &nbsp; ] Falhou</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><strong>CT-EX-005</strong></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>[ &nbsp; ] Passou &nbsp; [ &nbsp; ] Falhou</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>9. CRITÉRIOS DE ACEITAÇÃO</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 75%">Critério</th>
+        <th style="width: 25%">Resultado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Reenvio após Rejeição do Gestor funciona com sucesso (CT-EX-001)</td>
+        <td>[ &nbsp; ] Sim &nbsp; [ &nbsp; ] Não</td>
+      </tr>
+      <tr>
+        <td>Rejeição pelo Cliente encerra/bloqueia adequadamente (CT-EX-002)</td>
+        <td>[ &nbsp; ] Sim &nbsp; [ &nbsp; ] Não</td>
+      </tr>
+      <tr>
+        <td>Reprovação pela SPE impede faturamento e encerra fluxo (CT-EX-003)</td>
+        <td>[ &nbsp; ] Sim &nbsp; [ &nbsp; ] Não</td>
+      </tr>
+      <tr>
+        <td>Desvio de Desconto (Target &lt; Receita) exige alçada de aprovação em LPU Sim (CT-EX-004)</td>
+        <td>[ &nbsp; ] Sim &nbsp; [ &nbsp; ] Não &nbsp; [ &nbsp; ] N/A</td>
+      </tr>
+      <tr>
+        <td>O fluxo sem LPU não exige validação de Target/Desconto</td>
+        <td>[ &nbsp; ] Sim &nbsp; [ &nbsp; ] Não</td>
+      </tr>
+      <tr>
+        <td>Integração da Solicitação de Alta com o B.HUB ocorre com sucesso pós-ajustes (CT-EX-005)</td>
+        <td>[ &nbsp; ] Sim &nbsp; [ &nbsp; ] Não</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>10. RESUMO EXECUTIVO DA HOMOLOGAÇÃO</h2>
+  
+  <p><strong>Resultado Geral:</strong></p>
+  <p>[ &nbsp; ] APROVADO PARA PRODUÇÃO &nbsp; &nbsp; &nbsp; [ &nbsp; ] APROVADO COM RESSALVAS &nbsp; &nbsp; &nbsp; [ &nbsp; ] REPROVADO</p>
+  
+  <p style="margin-top: 15px;"><strong>Riscos Identificados:</strong></p>
+  <div style="border: 1px solid #cccccc; min-height: 60px; padding: 5px; margin-top: 5px;">&nbsp;</div>
+  
+  <p style="margin-top: 15px;"><strong>Pendências:</strong></p>
+  <div style="border: 1px solid #cccccc; min-height: 60px; padding: 5px; margin-top: 5px;">&nbsp;</div>
+  
+  <p style="margin-top: 15px;"><strong>Observações:</strong></p>
+  <div style="border: 1px solid #cccccc; min-height: 60px; padding: 5px; margin-top: 5px;">&nbsp;</div>
+
+</body>
+</html>
