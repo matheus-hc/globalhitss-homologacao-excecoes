@@ -611,7 +611,7 @@
 
       <div class="test-case-detail">
         <h4>Evidência</h4>
-        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem ou cole do clipboard (Ctrl+V)</div>
+        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem/PDF ou cole do clipboard (Ctrl+V)</div>
       </div>
 
       <div class="result-selector">
@@ -663,7 +663,7 @@
 
       <div class="test-case-detail">
         <h4>Evidência</h4>
-        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem ou cole do clipboard (Ctrl+V)</div>
+        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem/PDF ou cole do clipboard (Ctrl+V)</div>
       </div>
 
       <div class="result-selector">
@@ -715,7 +715,7 @@
 
       <div class="test-case-detail">
         <h4>Evidência</h4>
-        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem ou cole do clipboard (Ctrl+V)</div>
+        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem/PDF ou cole do clipboard (Ctrl+V)</div>
       </div>
 
       <div class="result-selector">
@@ -785,7 +785,7 @@
 
       <div class="test-case-detail">
         <h4>Evidência</h4>
-        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem ou cole do clipboard (Ctrl+V)</div>
+        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem/PDF ou cole do clipboard (Ctrl+V)</div>
       </div>
 
       <div class="result-selector">
@@ -840,7 +840,7 @@
 
       <div class="test-case-detail">
         <h4>Evidência</h4>
-        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem ou cole do clipboard (Ctrl+V)</div>
+        <div class="evidence-box" tabindex="0">Clique para anexar, arraste uma imagem/PDF ou cole do clipboard (Ctrl+V)</div>
       </div>
 
       <div class="result-selector">
@@ -1103,19 +1103,25 @@
   const savedTheme = localStorage.getItem('theme') || 'light';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  // --- CONTROLES DE ANEXOS DE IMAGEM (CLIPBOARD, CLIQUE E DRAG-AND-DROP) ---
+  // --- CONTROLES DE ANEXOS DE IMAGEM/PDF (CLIPBOARD, CLIQUE E DRAG-AND-DROP) ---
   document.querySelectorAll('.evidence-box').forEach((box, index) => {
     // Escutar eventos de colar do clipboard (Ctrl+V)
     box.addEventListener('paste', function(e) {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items;
       for (let item of items) {
-        if (item.kind === 'file' && item.type.startsWith('image/')) {
-          const blob = item.getAsFile();
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            displayImage(box, event.target.result);
-          };
-          reader.readAsDataURL(blob);
+        if (item.kind === 'file') {
+          const file = item.getAsFile();
+          if (file) {
+            const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            const isImage = file.type.startsWith('image/');
+            if (isImage || isPDF) {
+              const reader = new FileReader();
+              reader.onload = function(event) {
+                displayImage(box, event.target.result, file.name);
+              };
+              reader.readAsDataURL(file);
+            }
+          }
         }
       }
     });
@@ -1139,26 +1145,34 @@
       box.style.borderColor = 'var(--border-color)';
       box.style.backgroundColor = 'rgba(0, 0, 0, 0.01)';
       const files = e.dataTransfer.files;
-      if (files.length > 0 && files[0].type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          displayImage(box, event.target.result);
-        };
-        reader.readAsDataURL(files[0]);
+      if (files.length > 0) {
+        const file = files[0];
+        const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        const isImage = file.type.startsWith('image/');
+        if (isImage || isPDF) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            displayImage(box, event.target.result, file.name);
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert('Por favor, envie um arquivo de imagem ou PDF.');
+        }
       }
     });
 
     // Clique para abrir seletor
     box.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON' || e.target.closest('.evidence-image-container')) return;
+      if (e.target.tagName === 'BUTTON' || e.target.closest('.evidence-image-container') || e.target.closest('.evidence-pdf-container') || e.target.closest('a')) return;
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
-      fileInput.accept = 'image/*';
+      fileInput.accept = 'image/*,application/pdf';
       fileInput.onchange = function() {
         if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
           const reader = new FileReader();
           reader.onload = function(event) {
-            displayImage(box, event.target.result);
+            displayImage(box, event.target.result, file.name);
           };
           reader.readAsDataURL(fileInput.files[0]);
         }
@@ -1167,20 +1181,55 @@
     });
   });
 
-  function displayImage(box, src) {
-    box.innerHTML = `
-      <div class="evidence-image-container" style="position: relative; display: inline-block; max-width: 100%;">
-        <img src="${src}" style="max-width: 100%; max-height: 450px; border-radius: 8px; border: 1px solid var(--border-color); display: block;" />
-        <button class="btn btn-secondary no-print" style="position: absolute; top: 10px; right: 10px; padding: 6px 12px; background: rgba(255,255,255,0.9); font-size: 11px; border-radius: 6px;" onclick="removeImage(this)">Remover</button>
-      </div>
-    `;
+  function displayImage(box, src, fileName = '') {
+    const isPDF = src.startsWith('data:application/pdf') || src.includes('application/pdf') || (fileName && fileName.toLowerCase().endsWith('.pdf'));
+
+    if (isPDF) {
+      const displayName = fileName || 'evidencia.pdf';
+      box.innerHTML = `
+        <div class="evidence-pdf-container" style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.02); max-width: 100%;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <div style="text-align: left;">
+              <span style="font-weight: 600; font-size: 14px; color: var(--text-color); word-break: break-all;">${displayName}</span>
+              <span style="display: block; font-size: 11px; color: var(--text-secondary);">Arquivo PDF Anexado</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;" class="no-print">
+            <a href="${src}" target="_blank" class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; border-radius: 6px; text-decoration: none;">Visualizar PDF</a>
+            <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px; border-radius: 6px;" onclick="removeImage(this)">Remover</button>
+          </div>
+          <!-- Preview do PDF -->
+          <iframe class="pdf-preview" src="${src}" style="width: 100%; height: 350px; border: 1px solid var(--border-color); border-radius: 6px; margin-top: 10px;"></iframe>
+        </div>
+      `;
+    } else {
+      box.innerHTML = `
+        <div class="evidence-image-container" style="position: relative; display: inline-block; max-width: 100%;">
+          <img src="${src}" style="max-width: 100%; max-height: 450px; border-radius: 8px; border: 1px solid var(--border-color); display: block;" />
+          <button class="btn btn-secondary no-print" style="position: absolute; top: 10px; right: 10px; padding: 6px 12px; background: rgba(255,255,255,0.9); font-size: 11px; border-radius: 6px;" onclick="removeImage(this)">Remover</button>
+        </div>
+      `;
+    }
     box.setAttribute('data-img-src', src);
+    if (fileName) {
+      box.setAttribute('data-file-name', fileName);
+    } else {
+      box.removeAttribute('data-file-name');
+    }
   }
 
   function removeImage(btn) {
     const box = btn.closest('.evidence-box');
-    box.innerHTML = 'Clique para anexar, arraste uma imagem ou cole do clipboard (Ctrl+V)';
+    box.innerHTML = 'Clique para anexar, arraste uma imagem/PDF ou cole do clipboard (Ctrl+V)';
     box.removeAttribute('data-img-src');
+    box.removeAttribute('data-file-name');
   }
 
   // --- CONTROLE DE MELHORIAS DINÂMICAS ---
@@ -1208,7 +1257,8 @@
       inputs: [],
       radios: {},
       improvements: [],
-      images: {}
+      images: {},
+      fileNames: {}
     };
 
     // Salvar inputs de controle de execução e resumos
@@ -1232,11 +1282,15 @@
       });
     });
 
-    // Salvar imagens anexadas
+    // Salvar imagens/arquivos anexados
     document.querySelectorAll('.evidence-box').forEach((box, index) => {
       const src = box.getAttribute('data-img-src');
+      const name = box.getAttribute('data-file-name');
       if (src) {
         state.images[`img_${index}`] = src;
+        if (name) {
+          state.fileNames[`name_${index}`] = name;
+        }
       }
     });
 
@@ -1245,9 +1299,10 @@
       alert('Progresso salvo com sucesso localmente!');
     } catch (e) {
       if (e.name === 'QuotaExceededError') {
-        alert('Aviso: Limite de armazenamento atingido. O progresso foi salvo, mas algumas imagens são muito grandes. Tente salvar o documento como PDF para não perder seus anexos!');
+        alert('Aviso: Limite de armazenamento atingido. O progresso foi salvo, mas algumas evidências são muito grandes. Tente salvar o documento como PDF para não perder seus anexos!');
         // Tentar salvar sem as imagens para manter pelo menos o texto
         state.images = {};
+        state.fileNames = {};
         localStorage.setItem('homologation_test_state_excecoes', JSON.stringify(state));
       } else {
         alert('Erro ao salvar progresso: ' + e.message);
@@ -1289,12 +1344,13 @@
       });
     }
 
-    // Carregar imagens das evidências
+    // Carregar imagens/arquivos das evidências
     if (state.images) {
       document.querySelectorAll('.evidence-box').forEach((box, index) => {
         const src = state.images[`img_${index}`];
+        const name = state.fileNames ? state.fileNames[`name_${index}`] : '';
         if (src) {
-          displayImage(box, src);
+          displayImage(box, src, name);
         }
       });
     }
