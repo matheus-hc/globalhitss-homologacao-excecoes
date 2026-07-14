@@ -460,6 +460,19 @@
         </svg>
         Salvar Progresso
       </button>
+      <button class="btn btn-secondary" onclick="exportState()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-4-4 4m0 0-4-4m4 4V4" />
+        </svg>
+        Exportar JSON
+      </button>
+      <button class="btn btn-secondary" onclick="triggerImport()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-8-4-4m0 0L8 8m4-4v12" />
+        </svg>
+        Importar JSON
+      </button>
+      <input type="file" id="import-state-file" accept=".json" style="display: none;" onchange="importState(event)">
     </div>
 
     <!-- Header -->
@@ -1164,6 +1177,94 @@
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
+    // --- INDEXEDDB PARA ARMAZENAMENTO DE ALTO VOLUME ---
+    const DB_NAME = 'HomologacaoTestDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'test_state';
+
+    function getDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = function(e) {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+        };
+        request.onsuccess = function(e) {
+          resolve(e.target.result);
+        };
+        request.onerror = function(e) {
+          reject(e.target.error);
+        };
+      });
+    }
+
+    function saveToDB(key, val) {
+      return getDB().then(db => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.put(val, key);
+          req.onsuccess = () => resolve();
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    function getFromDB(key) {
+      return getDB().then(db => {
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_NAME, 'readonly');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.get(key);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      });
+    }
+
+    // --- COMPRESSÃO DE IMAGENS ---
+    function compressImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Limita largura/altura para no máximo 1200px para economizar muito espaço
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Comprime para JPEG de alta qualidade (0.7), economiza ~90% de espaço
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          callback(compressedDataUrl);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     // --- CONTROLES DE ANEXOS DE IMAGEM/PDF (CLIPBOARD, CLIQUE E DRAG-AND-DROP) ---
     document.querySelectorAll('.evidence-box').forEach((box, index) => {
       // Escutar eventos de colar do clipboard (Ctrl+V)
@@ -1175,7 +1276,11 @@
             if (file) {
               const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
               const isImage = file.type.startsWith('image/');
-              if (isImage || isPDF) {
+              if (isImage) {
+                compressImage(file, function(compressedUrl) {
+                  displayImage(box, compressedUrl, file.name);
+                });
+              } else if (isPDF) {
                 const reader = new FileReader();
                 reader.onload = function (event) {
                   displayImage(box, event.target.result, file.name);
@@ -1210,7 +1315,11 @@
           const file = files[0];
           const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
           const isImage = file.type.startsWith('image/');
-          if (isImage || isPDF) {
+          if (isImage) {
+            compressImage(file, function(compressedUrl) {
+              displayImage(box, compressedUrl, file.name);
+            });
+          } else if (isPDF) {
             const reader = new FileReader();
             reader.onload = function (event) {
               displayImage(box, event.target.result, file.name);
@@ -1231,11 +1340,19 @@
         fileInput.onchange = function () {
           if (fileInput.files.length > 0) {
             const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = function (event) {
-              displayImage(box, event.target.result, file.name);
-            };
-            reader.readAsDataURL(fileInput.files[0]);
+            const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            const isImage = file.type.startsWith('image/');
+            if (isImage) {
+              compressImage(file, function(compressedUrl) {
+                displayImage(box, compressedUrl, file.name);
+              });
+            } else if (isPDF) {
+              const reader = new FileReader();
+              reader.onload = function (event) {
+                displayImage(box, event.target.result, file.name);
+              };
+              reader.readAsDataURL(file);
+            }
           }
         };
         fileInput.click();
@@ -1312,8 +1429,8 @@
       tbody.appendChild(tr);
     }
 
-    // --- PERSISTÊNCIA DE DADOS (LOCALSTORAGE) ---
-    function saveState() {
+    // --- MONTAGEM DO OBJETO DE ESTADO ---
+    function getStateObj() {
       const state = {
         inputs: [],
         radios: {},
@@ -1355,27 +1472,15 @@
         }
       });
 
-      try {
-        localStorage.setItem('homologation_test_state_excecoes', JSON.stringify(state));
-        alert('Progresso salvo com sucesso localmente!');
-      } catch (e) {
-        if (e.name === 'QuotaExceededError') {
-          alert('Aviso: Limite de armazenamento atingido. O progresso foi salvo, mas algumas evidências são muito grandes. Tente salvar o documento como PDF para não perder seus anexos!');
-          // Tentar salvar sem as imagens para manter pelo menos o texto
-          state.images = {};
-          state.fileNames = {};
-          localStorage.setItem('homologation_test_state_excecoes', JSON.stringify(state));
-        } else {
-          alert('Erro ao salvar progresso: ' + e.message);
-        }
-      }
+      return state;
     }
 
-    function loadState() {
-      const saved = localStorage.getItem('homologation_test_state_excecoes');
-      if (!saved) return;
-
-      const state = JSON.parse(saved);
+    // --- APLICAÇÃO DO ESTADO NA TELA ---
+    function applyState(state) {
+      // Limpar inputs de melhorias
+      const tbody = document.getElementById('improvements-tbody');
+      tbody.innerHTML = '';
+      improvementCount = 0;
 
       // Carregar inputs gerais
       const inputs = document.querySelectorAll('.editable-input:not(.improvement-id):not(.improvement-desc):not(.improvement-imp):not(.improvement-prio):not(.improvement-resp), .editable-textarea');
@@ -1397,15 +1502,18 @@
 
       // Carregar melhorias dinâmicas
       if (state.improvements && state.improvements.length > 0) {
-        const tbody = document.getElementById('improvements-tbody');
-        tbody.innerHTML = ''; // Limpar padrão
-        improvementCount = 0;
         state.improvements.forEach(imp => {
           addImprovementRow(imp.id, imp.desc, imp.imp, imp.prio, imp.resp);
         });
       }
 
-      // Carregar imagens/arquivos das evidências
+      // Carregar evidências (limpa antes)
+      document.querySelectorAll('.evidence-box').forEach((box) => {
+        box.innerHTML = 'Clique para anexar, arraste uma imagem/PDF ou cole do clipboard (Ctrl+V)';
+        box.removeAttribute('data-img-src');
+        box.removeAttribute('data-file-name');
+      });
+
       if (state.images) {
         document.querySelectorAll('.evidence-box').forEach((box, index) => {
           const src = state.images[`img_${index}`];
@@ -1415,6 +1523,97 @@
           }
         });
       }
+    }
+
+    // --- PERSISTÊNCIA DE DADOS (LOCALSTORAGE / INDEXEDDB) ---
+    function saveState() {
+      const state = getStateObj();
+
+      saveToDB('homologation_test_state_excecoes', state)
+        .then(() => {
+          // Backup em localStorage sem as mídias para evitar QuotaExceededError
+          try {
+            const backupState = JSON.parse(JSON.stringify(state));
+            backupState.images = {};
+            backupState.fileNames = {};
+            localStorage.setItem('homologation_test_state_excecoes', JSON.stringify(backupState));
+          } catch(e) {}
+          alert('Progresso salvo com sucesso localmente!');
+        })
+        .catch(err => {
+          console.error('Erro ao salvar no IndexedDB:', err);
+          try {
+            localStorage.setItem('homologation_test_state_excecoes', JSON.stringify(state));
+            alert('Progresso salvo com sucesso localmente (localStorage)!');
+          } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+              alert('Aviso: Limite de armazenamento local excedido. Por favor, use a opção "Exportar JSON" para baixar seu progresso como um arquivo e não perder dados!');
+            } else {
+              alert('Erro ao salvar progresso: ' + e.message);
+            }
+          }
+        });
+    }
+
+    function loadState() {
+      getFromDB('homologation_test_state_excecoes')
+        .then(state => {
+          if (state) {
+            applyState(state);
+          } else {
+            loadFromLocalStorage();
+          }
+        })
+        .catch(err => {
+          console.error('Erro ao ler do IndexedDB:', err);
+          loadFromLocalStorage();
+        });
+    }
+
+    function loadFromLocalStorage() {
+      const saved = localStorage.getItem('homologation_test_state_excecoes');
+      if (!saved) return;
+      try {
+        const state = JSON.parse(saved);
+        applyState(state);
+      } catch(e) {
+        console.error('Erro ao ler do localStorage:', e);
+      }
+    }
+
+    // --- EXPORTAR E IMPORTAR JSON ---
+    function exportState() {
+      const state = getStateObj();
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "plano_testes_excecoes_progresso.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function triggerImport() {
+      document.getElementById('import-state-file').click();
+    }
+
+    function importState(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const state = JSON.parse(e.target.result);
+          applyState(state);
+          // Salva automaticamente no IndexedDB para persistir
+          saveToDB('homologation_test_state_excecoes', state).catch(console.error);
+          alert('Progresso importado e salvo com sucesso!');
+        } catch (err) {
+          alert('Erro ao importar o arquivo JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
     }
 
     // Inicializar carregamento de dados salvos ao abrir a página
