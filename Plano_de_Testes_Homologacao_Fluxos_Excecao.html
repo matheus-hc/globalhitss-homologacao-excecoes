@@ -459,20 +459,6 @@
           <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2zM17 21v-8H7v8M7 3v5h8" />
         </svg>
         Salvar Progresso
-      </button>
-      <button class="btn btn-secondary" onclick="exportState()">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-4-4 4m0 0-4-4m4 4V4" />
-        </svg>
-        Exportar JSON
-      </button>
-      <button class="btn btn-secondary" onclick="triggerImport()">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-8-4-4m0 0L8 8m4-4v12" />
-        </svg>
-        Importar JSON
-      </button>
-      <input type="file" id="import-state-file" accept=".json" style="display: none;" onchange="importState(event)">
     </div>
 
     <!-- Header -->
@@ -1547,7 +1533,7 @@
             alert('Progresso salvo com sucesso localmente (localStorage)!');
           } catch (e) {
             if (e.name === 'QuotaExceededError') {
-              alert('Aviso: Limite de armazenamento local excedido. Por favor, use a opção "Exportar JSON" para baixar seu progresso como um arquivo e não perder dados!');
+              alert('Aviso: Limite de armazenamento atingido. O progresso foi salvo, mas algumas evidências são muito grandes. Tente salvar o documento como PDF para não perder seus anexos!');
             } else {
               alert('Erro ao salvar progresso: ' + e.message);
             }
@@ -1581,40 +1567,7 @@
       }
     }
 
-    // --- EXPORTAR E IMPORTAR JSON ---
-    function exportState() {
-      const state = getStateObj();
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "plano_testes_excecoes_progresso.json");
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
 
-    function triggerImport() {
-      document.getElementById('import-state-file').click();
-    }
-
-    function importState(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const state = JSON.parse(e.target.result);
-          applyState(state);
-          // Salva automaticamente no IndexedDB para persistir
-          saveToDB('homologation_test_state_excecoes', state).catch(console.error);
-          alert('Progresso importado e salvo com sucesso!');
-        } catch (err) {
-          alert('Erro ao importar o arquivo JSON: ' + err.message);
-        }
-      };
-      reader.readAsText(file);
-    }
 
     // Inicializar carregamento de dados salvos ao abrir a página
     window.onload = loadState;
